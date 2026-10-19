@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chaos-Tic apt repository</title>
+<style>
+  body { font: 16px/1.5 system-ui, sans-serif; max-width: 46rem; margin: 2rem auto; padding: 0 1rem; color: #1d1d1f; background: #fff; }
+  pre { background: #f2f2f4; padding: 1rem; overflow-x: auto; border-radius: 6px; }
+  @media (prefers-color-scheme: dark) { body { color: #e8e8ea; background: #121214; } pre { background: #1f1f23; } }
+</style>
+<h1>Chaos-Tic apt repository</h1>
+<p>Packages for Debian 12+ and Ubuntu 24.04+, updated by <code>apt upgrade</code>.
+Projects: <a href="https://github.com/Chaos-Tic/Lorenz">Lorenz</a>.</p>
+<pre>sudo curl -fsSLo /usr/share/keyrings/chaos-tic.gpg https://chaos-tic.github.io/apt/chaos-tic-apt.gpg
+echo "deb [signed-by=/usr/share/keyrings/chaos-tic.gpg] https://chaos-tic.github.io/apt stable main" |
+  sudo tee /etc/apt/sources.list.d/chaos-tic.list
+sudo apt update
+sudo apt install lorenz</pre>
+<p>Signing key fingerprint: <code>B968 F27E 534B 7AD3 2C2A 026A C874 EC5C A8A6 42AE</code>.
+Source: <a href="https://github.com/Chaos-Tic/apt">github.com/Chaos-Tic/apt</a>.</p>
+</html>

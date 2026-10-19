@@ -1,0 +1,2 @@
+# One GitHub repository per line: the .deb files of its latest release are published.
+Chaos-Tic/Lorenz
