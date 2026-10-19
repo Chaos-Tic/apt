@@ -28,6 +28,6 @@ The key is limited to this repository by `signed-by`. Its fingerprint is
 `projects.txt` lists the projects. The *Publish* workflow downloads the `.deb`
 files of each project's latest release (built and tested by that project's
 CI), indexes them with `apt-ftparchive`, signs the index and deploys it to
-GitHub Pages. It runs every six hours, on each push, by hand, and when a
+GitHub Pages. It runs every hour, on each push, by hand, and when a
 project sends a `repository_dispatch` event. Adding a project is one line in
 `projects.txt`.
