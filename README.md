@@ -11,7 +11,7 @@ sudo curl -fsSLo /usr/share/keyrings/chaos-tic.gpg https://chaos-tic.github.io/a
 echo "deb [signed-by=/usr/share/keyrings/chaos-tic.gpg] https://chaos-tic.github.io/apt stable main" |
   sudo tee /etc/apt/sources.list.d/chaos-tic.list
 sudo apt update
-sudo apt install lorenz
+sudo apt install lorenz lyapunov
 ```
 
 The key is limited to this repository by `signed-by`. Its fingerprint is
@@ -22,6 +22,7 @@ The key is limited to this repository by `signed-by`. Its fingerprint is
 | Package | Project |
 | --- | --- |
 | `lorenz` | [Lorenz](https://github.com/Chaos-Tic/Lorenz): local file conversion with radial wheels |
+| `lyapunov` | [Lyapunov](https://github.com/Chaos-Tic/Lyapunov): save an activity as a card and resume it later |
 
 ## How it works
 
