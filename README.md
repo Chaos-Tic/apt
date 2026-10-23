@@ -22,6 +22,7 @@ The key is limited to this repository by `signed-by`. Its fingerprint is
 | Package | Project |
 | --- | --- |
 | `lorenz` | [Lorenz](https://github.com/Chaos-Tic/Lorenz): local file conversion with radial wheels |
+| `chaostictool-desktop` | [ChaosticTool Desktop](https://github.com/Chaos-Tic/Chaostic-Tool/tree/desktop/linux-app): native graphical workspace; x86-64 Ubuntu 22.04+ / Debian 12+, ARM64 Ubuntu 24.04+ / Debian 13+ |
 | `chaostictool` | [ChaosticTool CLI](https://github.com/Chaos-Tic/Chaostic-Tool/tree/linux-cli): terminal interface for authorized security testing; Debian 13+ / Ubuntu 24.04+ |
 | `lyapunov` | [Lyapunov](https://github.com/Chaos-Tic/Lyapunov): save an activity as a card and resume it later |
 
