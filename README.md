@@ -22,6 +22,7 @@ The key is limited to this repository by `signed-by`. Its fingerprint is
 | Package | Project |
 | --- | --- |
 | `lorenz` | [Lorenz](https://github.com/Chaos-Tic/Lorenz): local file conversion with radial wheels |
+| `chaostictool` | [ChaosticTool CLI](https://github.com/Chaos-Tic/Chaostic-Tool/tree/linux-cli): terminal interface for authorized security testing; Debian 13+ / Ubuntu 24.04+ |
 | `lyapunov` | [Lyapunov](https://github.com/Chaos-Tic/Lyapunov): save an activity as a card and resume it later |
 
 ## How it works
@@ -31,4 +32,5 @@ files of each project's latest release (built and tested by that project's
 CI), indexes them with `apt-ftparchive`, signs the index and deploys it to
 GitHub Pages. It runs every hour, on each push, by hand, and when a
 project sends a `repository_dispatch` event. Adding a project is one line in
-`projects.txt`.
+`projects.txt`. An optional second column selects a tag prefix, e.g. `v` or
+`desktop-v`, for projects that publish multiple editions in one repository.

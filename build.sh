@@ -5,11 +5,19 @@
 set -euo pipefail
 rm -rf public pool-download
 mkdir -p public/pool/main pool-download
-while read -r repo; do
+while read -r repo tag_prefix; do
     case $repo in ''|'#'*) continue ;; esac
     name=$(basename "$repo" | tr '[:upper:]' '[:lower:]')
     mkdir -p "public/pool/main/$name"
-    gh release download --repo "$repo" --pattern '*.deb' --dir "public/pool/main/$name" --clobber
+    release_args=()
+    if [ -n "${tag_prefix:-}" ]; then
+        # One repository can publish separate CLI and desktop release streams.
+        tag=$(gh release list --repo "$repo" --exclude-drafts --exclude-pre-releases --limit 100 \
+            --json tagName --jq "map(.tagName) | map(select(startswith(\"$tag_prefix\"))) | first // empty")
+        [ -n "$tag" ] || { echo "No published release for $repo ($tag_prefix)" >&2; exit 1; }
+        release_args+=("$tag")
+    fi
+    gh release download "${release_args[@]}" --repo "$repo" --pattern '*.deb' --dir "public/pool/main/$name" --clobber
 done <projects.txt
 
 cd public
