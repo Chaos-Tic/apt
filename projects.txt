@@ -2,4 +2,3 @@
 Chaos-Tic/Lorenz
 Chaos-Tic/Lyapunov
 Chaos-Tic/Chaostic-Tool v
-Chaos-Tic/Chaostic-Tool desktop-v
