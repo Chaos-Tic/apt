@@ -1,0 +1,41 @@
+{
+  "_comment": "Distribution channels audited by the Channels workflow (channels.py). Versions are compared with the project's latest GitHub release. 'frozen' lists channels or series that stay on an older version on purpose, with the reason.",
+  "projects": [
+    {
+      "name": "Lorenz",
+      "github": "Chaos-Tic/Lorenz",
+      "tag_prefix": "v",
+      "apt": "lorenz",
+      "ppa": "chaos-tic/lorenz",
+      "ppa_source": "lorenz",
+      "copr": "chaostic/lorenz",
+      "aur": "lorenz",
+      "winget": "ChaosTic.Lorenz"
+    },
+    {
+      "name": "Lyapunov",
+      "github": "Chaos-Tic/Lyapunov",
+      "tag_prefix": "v",
+      "apt": "lyapunov",
+      "ppa": "chaos-tic/lyapunov",
+      "ppa_source": "lyapunov",
+      "copr": "chaostic/lyapunov",
+      "aur": "lyapunov",
+      "winget": "ChaosTic.Lyapunov"
+    },
+    {
+      "name": "ChaosticTool",
+      "github": "Chaos-Tic/Chaostic-Tool",
+      "tag_prefix": "v",
+      "apt": "chaostictool",
+      "ppa": "chaos-tic/chaostictool",
+      "ppa_source": "chaostictool",
+      "copr": "chaostic/chaostictool",
+      "aur": "chaostictool",
+      "winget": "ChaosTic.ChaosticTool",
+      "frozen": {
+        "ppa:noble": "Ubuntu 24.04 has no PySide6 >= 6.8; the unified package stays at 1.5.0 there"
+      }
+    }
+  ]
+}

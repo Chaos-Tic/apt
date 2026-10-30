@@ -22,8 +22,7 @@ The key is limited to this repository by `signed-by`. Its fingerprint is
 | Package | Project |
 | --- | --- |
 | `lorenz` | [Lorenz](https://github.com/Chaos-Tic/Lorenz): local file conversion with radial wheels |
-| `chaostictool-desktop` | [ChaosticTool Desktop](https://github.com/Chaos-Tic/Chaostic-Tool/tree/desktop/linux-app): native graphical workspace; x86-64 Ubuntu 22.04+ / Debian 12+, ARM64 Ubuntu 24.04+ / Debian 13+ |
-| `chaostictool` | [ChaosticTool CLI](https://github.com/Chaos-Tic/Chaostic-Tool/tree/linux-cli): terminal interface for authorized security testing; Debian 13+ / Ubuntu 24.04+ |
+| `chaostictool` | [ChaosticTool](https://github.com/Chaos-Tic/Chaostic-Tool): terminal and desktop interfaces for authorized security testing; Debian 13+ / Ubuntu 24.04+ (replaces the former `chaostictool-desktop`) |
 | `lyapunov` | [Lyapunov](https://github.com/Chaos-Tic/Lyapunov): save an activity as a card and resume it later |
 
 ## How it works
@@ -35,3 +34,13 @@ GitHub Pages. It runs every hour, on each push, by hand, and when a
 project sends a `repository_dispatch` event. Adding a project is one line in
 `projects.txt`. An optional second column selects a tag prefix, e.g. `v` or
 `desktop-v`, for projects that publish multiple editions in one repository.
+
+## Channel audit
+
+The *Channels* workflow (`channels.yml`, `channels.py`, `channels.json`)
+compares each project's latest release with the versions served by this
+repository, the Launchpad PPAs, Fedora COPR, the AUR and winget, twice a week
+and on demand. When a channel lags or its last build failed, the run fails
+and the issue *Distribution channels lag behind* is opened or refreshed with
+the table; it is closed once every channel is aligned. A channel that stays
+behind on purpose is listed under `frozen` in `channels.json` with the reason.
