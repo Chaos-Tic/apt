@@ -2,6 +2,8 @@
 """Compares each project's latest GitHub release with what the distribution
 channels serve (apt repository, Launchpad PPA, Fedora COPR, AUR, winget) and
 prints a Markdown report. Exit status 1 when a channel lags or is broken.
+A winget version that is validated upstream and only waits for a moderator
+is reported as "review": nothing is left to fix on this side.
 
     channels.py [channels.json] [--summary FILE]
 
@@ -12,10 +14,12 @@ import os
 import re
 import sys
 import urllib.error
+import urllib.parse
 import urllib.request
 
 GITHUB_API = "https://api.github.com"
 WINGET_REPO = "microsoft/winget-pkgs"
+WINGET_VALIDATOR = "wingetvalidator-prod"  # the GitHub App that reports their pipeline
 APT_INDEX = "https://chaos-tic.github.io/apt/dists/stable/main/binary-amd64/Packages"
 TIMEOUT = 30
 
@@ -106,19 +110,51 @@ def winget_version(identifier):
     return max(versions, key=version_key) if versions else None
 
 
+def winget_validated(number):
+    """Whether their validation pipeline passed on the pull request's current
+    commit. The Validation-Completed label is not enough: it stays on the pull
+    request while a new commit is being validated."""
+    head = fetch_json(f"{GITHUB_API}/repos/{WINGET_REPO}/pulls/{number}")["head"]["sha"]
+    runs, page = [], 1
+    while True:
+        batch = fetch_json(f"{GITHUB_API}/repos/{WINGET_REPO}/commits/{head}/check-runs"
+                           f"?per_page=100&page={page}")["check_runs"]
+        runs += [run for run in batch if run["app"]["slug"] == WINGET_VALIDATOR]
+        if len(batch) < 100:
+            break
+        page += 1
+    return bool(runs) and all(run["conclusion"] == "success" for run in runs)
+
+
+def winget_submission(identifier, author):
+    """(number, version, labels) of the author's open winget-pkgs pull request
+    that submits the highest version of the package, or None."""
+    query = f'repo:{WINGET_REPO} is:pr is:open author:{author} in:title "{identifier} version"'
+    found = fetch_json(f"{GITHUB_API}/search/issues?per_page=30&q={urllib.parse.quote(query)}")
+    best = None
+    for item in found.get("items", []):
+        match = re.search(rf"\b{re.escape(identifier)} version (\d\S*)", item["title"])
+        if match and (best is None or version_key(match.group(1)) > version_key(best[1])):
+            best = (item["number"], match.group(1), {label["name"] for label in item["labels"]})
+    return best
+
+
 def check(project, apt_index):
     """(latest release, rows of (channel, served version, status, note))."""
     want = upstream(project)
     frozen = project.get("frozen", {})
     rows = []
 
-    def row(channel, got, ok=None, note=""):
+    def current(got):
+        return got is not None and version_key(got) >= version_key(want)
+
+    def row(channel, got, ok=None, note="", status=None):
         if channel in frozen:
             rows.append((channel, got or "-", "frozen", frozen[channel]))
             return
         if ok is None:
-            ok = got is not None and version_key(got) >= version_key(want)
-        rows.append((channel, got or "-", "ok" if ok else "LAG", note))
+            ok = current(got)
+        rows.append((channel, got or "-", status or ("ok" if ok else "LAG"), note))
 
     def guarded(channel, call):
         try:
@@ -142,8 +178,23 @@ def check(project, apt_index):
 
     def winget():
         version = winget_version(project["winget"])
-        note = "" if version else "not in winget-pkgs yet (the first submission is manual)"
-        row("winget", version, note=note)
+        if current(version):
+            row("winget", version)
+            return
+        submission = winget_submission(project["winget"], project["github"].split("/")[0])
+        if submission is None:
+            note = "" if version else "not in winget-pkgs yet (the first submission is manual)"
+            row("winget", version, note=note)
+            return
+        number, submitted, labels = submission
+        pull = f"`winget-pkgs#{number}`"  # code span: no cross-reference on their pull request
+        if not current(submitted):
+            row("winget", version, note=f"{pull} submits {submitted}, not {want}")
+        elif "Needs-Author-Feedback" not in labels and winget_validated(number):
+            row("winget", version, status="review",
+                note=f"{submitted} is validated and waits for a winget moderator ({pull})")
+        else:
+            row("winget", version, note=f"{pull} submits {submitted} but is not validated yet")
 
     if "apt" in project:
         guarded("apt", lambda: row("apt", apt_version(project["apt"], apt_index)))

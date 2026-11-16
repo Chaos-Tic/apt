@@ -3,8 +3,10 @@ name: Channels
 # apt repository, the Launchpad PPAs, Fedora COPR, the AUR and winget
 # (channels.json, channels.py). On a lag or a broken channel the run fails
 # and the issue "Distribution channels lag behind" is opened or refreshed;
-# it is closed once everything is aligned again. Runs twice a week, by hand,
-# and a day after a project's release dispatch (channels need time to build).
+# it is closed once everything is aligned again. A winget version that is
+# validated upstream and waits for a moderator does not count as a lag.
+# Runs twice a week, by hand, and a day after a project's release dispatch
+# (channels need time to build).
 on:
   schedule:
     - cron: '41 6 * * 1,4'
@@ -36,7 +38,7 @@ jobs:
             --jq ".[] | select(.title == \"$TITLE\") | .number" | head -n1)
           run_url="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
           {
-            echo "Audit of $(date -u +%Y-%m-%d) ([run]($run_url)). Rows marked LAG or ERROR need a fix: look at the project's release job or the channel's own dashboard, or mark the channel frozen on purpose in \`channels.json\`."
+            echo "Audit of $(date -u +%Y-%m-%d) ([run]($run_url)). Rows marked LAG or ERROR need a fix: look at the project's release job or the channel's own dashboard, or mark the channel frozen on purpose in \`channels.json\`. Rows marked review wait for the channel's own reviewers and need nothing here."
             echo
             cat report.md
           } >body.md
