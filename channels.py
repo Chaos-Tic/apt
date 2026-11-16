@@ -14,7 +14,6 @@ import os
 import re
 import sys
 import urllib.error
-import urllib.parse
 import urllib.request
 
 GITHUB_API = "https://api.github.com"
@@ -129,10 +128,14 @@ def winget_validated(number):
 def winget_submission(identifier, author):
     """(number, version, labels) of the author's open winget-pkgs pull request
     that submits the highest version of the package, or None."""
-    query = f'repo:{WINGET_REPO} is:pr is:open author:{author} in:title "{identifier} version"'
-    found = fetch_json(f"{GITHUB_API}/search/issues?per_page=30&q={urllib.parse.quote(query)}")
+    # The issues listing, not the search API: the search returns nothing to
+    # the token of a workflow that runs in another repository.
+    found = fetch_json(f"{GITHUB_API}/repos/{WINGET_REPO}/issues"
+                       f"?creator={author}&state=open&per_page=100")
     best = None
-    for item in found.get("items", []):
+    for item in found:
+        if "pull_request" not in item:
+            continue
         match = re.search(rf"\b{re.escape(identifier)} version (\d\S*)", item["title"])
         if match and (best is None or version_key(match.group(1)) > version_key(best[1])):
             best = (item["number"], match.group(1), {label["name"] for label in item["labels"]})
