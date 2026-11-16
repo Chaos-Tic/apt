@@ -44,3 +44,6 @@ and on demand. When a channel lags or its last build failed, the run fails
 and the issue *Distribution channels lag behind* is opened or refreshed with
 the table; it is closed once every channel is aligned. A channel that stays
 behind on purpose is listed under `frozen` in `channels.json` with the reason.
+A winget version whose pull request is validated in `microsoft/winget-pkgs`
+and only waits for a moderator is reported as `review` and does not keep the
+issue open: nothing is left to fix on this side.
