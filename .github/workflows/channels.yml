@@ -11,15 +11,20 @@ on:
   schedule:
     - cron: '41 6 * * 1,4'
   workflow_dispatch:
-permissions:
-  contents: read
-  issues: write
+permissions: {}
 concurrency:
   group: channels
   cancel-in-progress: true
 jobs:
+  # The audit runs without the issues permission: a token that has it gets an
+  # empty list when it reads the pull requests of microsoft/winget-pkgs.
   audit:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      status: ${{ steps.audit.outputs.status }}
+      report: ${{ steps.audit.outputs.report }}
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
       - id: audit
@@ -29,9 +34,18 @@ jobs:
           set +e
           python3 channels.py channels.json --summary "$GITHUB_STEP_SUMMARY" >report.md
           echo "status=$?" >>"$GITHUB_OUTPUT"
+          { echo "report<<END_OF_REPORT"; cat report.md; echo "END_OF_REPORT"; } >>"$GITHUB_OUTPUT"
+  issue:
+    needs: audit
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    steps:
       - env:
           GH_TOKEN: ${{ github.token }}
-          STATUS: ${{ steps.audit.outputs.status }}
+          GH_REPO: ${{ github.repository }}
+          STATUS: ${{ needs.audit.outputs.status }}
+          REPORT: ${{ needs.audit.outputs.report }}
           TITLE: Distribution channels lag behind
         run: |
           number=$(gh issue list --state open --search "in:title \"$TITLE\"" --json number,title \
@@ -40,7 +54,7 @@ jobs:
           {
             echo "Audit of $(date -u +%Y-%m-%d) ([run]($run_url)). Rows marked LAG or ERROR need a fix: look at the project's release job or the channel's own dashboard, or mark the channel frozen on purpose in \`channels.json\`. Rows marked review wait for the channel's own reviewers and need nothing here."
             echo
-            cat report.md
+            printf '%s\n' "$REPORT"
           } >body.md
           if [ "$STATUS" = 0 ]; then
             if [ -n "$number" ]; then

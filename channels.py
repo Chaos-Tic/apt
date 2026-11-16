@@ -128,8 +128,8 @@ def winget_validated(number):
 def winget_submission(identifier, author):
     """(number, version, labels) of the author's open winget-pkgs pull request
     that submits the highest version of the package, or None."""
-    # The issues listing, not the search API: the search returns nothing to
-    # the token of a workflow that runs in another repository.
+    # A token that carries the issues permission of another repository gets
+    # an empty list here: the audit job of channels.yml runs without it.
     found = fetch_json(f"{GITHUB_API}/repos/{WINGET_REPO}/issues"
                        f"?creator={author}&state=open&per_page=100")
     best = None
